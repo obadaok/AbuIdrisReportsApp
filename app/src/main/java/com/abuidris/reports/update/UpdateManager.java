@@ -21,16 +21,18 @@ public class UpdateManager {
     private static final String KEY_APK_PATH = "pending_apk_path";
 
     private final Context context;
+    private final Handler mainHandler;
 
     public UpdateManager(Context context) {
         this.context = context.getApplicationContext();
+        this.mainHandler = new Handler(Looper.getMainLooper());
     }
 
     public void checkAndDownload() {
         VersionChecker.check(context, new VersionChecker.Callback() {
             @Override
             public void onResult(int remoteVersionCode, String apkUrl, String versionName) {
-                showProgressAndDownload(remoteVersionCode, apkUrl, versionName);
+                mainHandler.post(() -> showProgressAndDownload(remoteVersionCode, apkUrl, versionName));
             }
 
             @Override
