@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">معمل أبو إدريس</string>
+    <string name="revenue">الإيرادات</string>
+    <string name="expenses">المصروفات</string>
+    <string name="net_profit">صافي الأرباح</string>
+    <string name="samples_count">عدد العينات</string>
+    <string name="total_revenue">إجمالي الإيرادات</string>
+    <string name="total_expenses">إجمالي المصروفات</string>
+    <string name="report_detail">تفاصيل التقرير</string>
+    <string name="no_reports">لا توجد تقارير متاحة</string>
+    <string name="sync_status">آخر مزامنة</string>
+    <string name="new_report">تقرير جديد متاح</string>
+    <string name="channel_name">تقارير المعمل</string>
+    <string name="channel_description">إشعارات التقارير الشهرية</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NeoBrutalismButton">
+        <item name="android:background">#FF000000</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:padding">12dp</item>
+    </style>
+</resources>

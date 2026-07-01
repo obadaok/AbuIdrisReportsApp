@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:background="#FFFFFFFF">
+
+    <LinearLayout
+        android:id="@+id/reportDetailRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="28dp"
+            android:paddingBottom="20dp"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_launcher_foreground"
+                android:layout_marginBottom="6dp"
+                android:contentDescription="Logo" />
+
+            <TextView
+                android:id="@+id/detailMonthTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF000000"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="معمل أبو إدريس - فرع نورايا"
+                android:textColor="#FF000000"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:alpha="0.6" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#FF000000" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <!-- العينات Card -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:minHeight="130dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="4dp"
+                        android:background="#FF000000" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#FF000000">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3dp"
+                            android:background="#FFFFFFFF"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="العينات"
+                                android:textColor="#666666"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif" />
+
+                            <TextView
+                                android:id="@+id/detailSamples"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#FF000000"
+                                android:textSize="32sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif"
+                                android:layout_marginTop="4dp"
+                                android:maxLines="1"
+                                android:ellipsize="none" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
+                <!-- الإيرادات Card -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:minHeight="130dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="4dp"
+                        android:background="#FF000000" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#FF000000">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3dp"
+                            android:background="#FFFFFFFF"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="الإيرادات"
+                                android:textColor="#666666"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif" />
+
+                            <TextView
+                                android:id="@+id/detailRevenue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#FF000000"
+                                android:textSize="32sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif"
+                                android:layout_marginTop="4dp"
+                                android:maxLines="1"
+                                android:ellipsize="none" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:weightSum="2">
+
+                <!-- المصروفات Card -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:minHeight="130dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="4dp"
+                        android:background="#FF000000" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#FF000000">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3dp"
+                            android:background="#FFFFFFFF"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="المصروفات"
+                                android:textColor="#666666"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif" />
+
+                            <TextView
+                                android:id="@+id/detailExpenses"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#FF000000"
+                                android:textSize="32sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif"
+                                android:layout_marginTop="4dp"
+                                android:maxLines="1"
+                                android:ellipsize="none" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
+                <!-- صافي الربح Card -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:minHeight="130dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="4dp"
+                        android:background="#FF000000" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#FF000000">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3dp"
+                            android:background="#FFFFFFFF"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:paddingHorizontal="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="صافي الربح"
+                                android:textColor="#666666"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif" />
+
+                            <TextView
+                                android:id="@+id/detailNetProfit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#FF000000"
+                                android:textSize="32sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif"
+                                android:layout_marginTop="4dp"
+                                android:maxLines="1"
+                                android:ellipsize="none" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#FF000000" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="بنود المصروفات"
+                android:textColor="#FF000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:id="@+id/expensesDetailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

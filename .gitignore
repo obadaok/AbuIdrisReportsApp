@@ -1,0 +1,14 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+functions/node_modules/
+admin/fcm-server.js
+bida-ai-999-firebase-adminsdk-fbsvc-64d2260a9c.json
