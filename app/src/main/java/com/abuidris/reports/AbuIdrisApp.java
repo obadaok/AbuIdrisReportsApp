@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import com.abuidris.reports.data.local.AppDatabase;
 import com.abuidris.reports.data.sync.ReportsSyncHelper;
+import com.abuidris.reports.update.UpdateManager;
 import com.abuidris.reports.util.SoundManager;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -43,6 +44,10 @@ public class AbuIdrisApp extends Application {
         SoundManager.getInstance(this).preload();
 
         FirebaseMessaging.getInstance().subscribeToTopic("all");
+
+        UpdateManager updateManager = new UpdateManager(this);
+        updateManager.checkPendingInstall();
+        updateManager.checkAndDownload();
     }
 
     private void createNotificationChannel() {
