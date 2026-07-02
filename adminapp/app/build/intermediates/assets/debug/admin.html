@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>لوحة تحكم - معمل أبو إدريس</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --black: #000000; --white: #FFFFFF; --gray-light: #F5F5F5; --gray-mid: #CCCCCC; --gray-dark: #666666; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html { -webkit-text-size-adjust: 100%; }
+        body { font-family: 'Almarai', sans-serif; background: var(--white); color: var(--black); line-height: 1.6; min-height: 100vh; overscroll-behavior-y: contain; }
+        button, .neo-btn, input, select, textarea, td { touch-action: manipulation; }
+        input, select, textarea { font-size: 16px !important; } /* يمنع تكبير الشاشة تلقائيًا داخل WebView على أندرويد */
+        .neo-card { background: var(--white); border: 3px solid var(--black); box-shadow: 4px 4px 0 var(--black); padding: 24px; margin-bottom: 20px; }
+        .neo-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: var(--black); color: var(--white); border: 3px solid var(--black); font-family: 'Almarai', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0 var(--black); transition: all 0.1s ease; }
+        .neo-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--black); }
+        .neo-btn-outline { background: var(--white); color: var(--black); }
+        .neo-btn-sm { padding: 8px 14px; font-size: 12px; }
+        .neo-input { width: 100%; padding: 12px; border: 3px solid var(--black); font-family: 'Almarai', sans-serif; font-size: 14px; background: var(--white); color: var(--black); box-shadow: 4px 4px 0 var(--black); }
+        .neo-input:focus { outline: none; background: var(--gray-light); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        h1 { font-size: 28px; font-weight: 800; }
+        h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .header-bar { background: var(--black); color: var(--white); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .header-bar h1 { font-size: 18px; margin: 0; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-full { grid-column: 1 / -1; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 700; font-size: 12px; margin-bottom: 4px; color: var(--gray-dark); }
+        .expense-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .expense-row .expense-desc { flex: 2; }
+        .expense-row .expense-amount { flex: 1; }
+        .expense-row .neo-btn { flex: 0 0 auto; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 10px 12px; text-align: right; border: 2px solid var(--black); font-size: 13px; }
+        th { background: var(--black); color: var(--white); font-weight: 700; }
+        td { cursor: pointer; }
+        td:hover { background: var(--gray-light); }
+        .text-amount { text-align: left; direction: ltr; font-weight: 700; }
+        #loginSection, #dashboardSection { display: none; }
+        #loginSection.active, #dashboardSection.active { display: block; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 16px 24px; border: 3px solid var(--black); background: var(--white); font-weight: 700; box-shadow: 4px 4px 0 var(--black); z-index: 999; display: none; }
+        .toast.show { display: block; }
+        .toast.success { border-color: var(--black); }
+        .toast.error { border-color: #FF0000; }
+        .login-box { max-width: 400px; margin: 80px auto; text-align: center; }
+        .login-box h1 { margin-bottom: 24px; }
+        .login-box .neo-input { margin-bottom: 12px; text-align: center; }
+        .result-box { margin-top: 16px; padding: 12px; border: 3px solid var(--black); background: var(--gray-light); font-size: 13px; white-space: pre-wrap; }
+        .result-box.pass { border-color: #000000; }
+        .result-box.fail { border-color: #FF0000; background: #FFF5F5; }
+        .flex-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mt-12 { margin-top: 12px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
+        .hidden { display: none; }
+        .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-scroll table { min-width: 620px; }
+        .stat-badge { display: inline-block; padding: 4px 12px; background: var(--black); color: var(--white); font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .header-bar { flex-direction: column; gap: 10px; text-align: center; padding: 12px 12px; }
+            .header-bar > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px !important; }
+            .header-bar > div .neo-btn { margin-left: 0 !important; font-size: 12px; padding: 10px 12px; min-width: 0; }
+            .header-bar h1 { font-size: 15px; }
+            .neo-btn { padding: 12px 18px; font-size: 13px; min-height: 44px; }
+            .neo-btn-sm { padding: 10px 14px; font-size: 12px; min-height: 40px; }
+            .neo-input { padding: 14px 12px; min-height: 44px; }
+            .container { padding: 10px; }
+            .neo-card { padding: 14px; }
+            .expense-row { gap: 6px; }
+            .expense-row .expense-desc { flex: 1.5; }
+            .expense-row .expense-amount { flex: 1; }
+            .expense-row .neo-btn { padding: 12px 10px !important; min-height: 44px; min-width: 44px; }
+            td, th { padding: 8px 8px; font-size: 12px; }
+            .login-box { margin: 40px 12px; }
+            .result-box { font-size: 12px; }
+            .table-scroll table { min-width: 580px; }
+            .form-group label { font-size: 11px; }
+            h2 { font-size: 16px; }
+            h3 { font-size: 13px; }
+        }
+        @media (max-width: 420px) {
+            .header-bar > div .neo-btn { font-size: 11px; padding: 8px 10px; min-height: 40px; }
+            .expense-row { flex-wrap: wrap; gap: 4px; }
+            .expense-row .expense-desc { flex: 1 1 100%; }
+            .expense-row .expense-amount { flex: 1; }
+            .expense-row .neo-btn { flex: 0 0 44px; }
+            td, th { padding: 6px 5px; font-size: 11px; }
+            .neo-card { padding: 10px; }
+            .container { padding: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<div class="header-bar">
+    <h1>معمل أبو إدريس - فرع نورايا</h1>
+    <div>
+        <button class="neo-btn" style="background:white;color:black;margin-left:8px;" onclick="showSection('dashboard')">
+            <i class="fas fa-plus"></i> إدخال تقرير
+        </button>
+        <button class="neo-btn" style="background:white;color:black;margin-left:8px;" onclick="showSection('notifications')">
+            <i class="fas fa-bell"></i> إشعارات
+        </button>
+        <button class="neo-btn" style="background:white;color:black;margin-left:8px;" onclick="showSection('history')">
+            <i class="fas fa-history"></i> التقارير السابقة
+        </button>
+        <button class="neo-btn" style="background:white;color:black;" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> خروج
+        </button>
+    </div>
+</div>
+
+<div class="container">
+
+    <div id="loginSection" style="display:none">
+        <div class="login-box neo-card">
+            <h1>تسجيل دخول المحاسب</h1>
+            <input type="email" id="loginEmail" class="neo-input" placeholder="البريد الإلكتروني" />
+            <input type="password" id="loginPassword" class="neo-input" placeholder="كلمة المرور" />
+            <button class="neo-btn" style="width:100%;display:none" onclick="login()">
+                <i class="fas fa-lock"></i> دخول
+            </button>
+        </div>
+    </div>
+
+    <div id="dashboardSection">
+        <div class="neo-card">
+            <div class="flex-row" style="justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div>
+                    <span class="stat-badge" id="formModeBadge">تقرير جديد</span>
+                    <h2 style="margin:0;" id="formTitle">إدخال بيانات التقرير الشهري</h2>
+                </div>
+                <div class="flex-row">
+                    <span id="currentUserDisplay" style="font-size:13px;color:var(--gray-dark);"></span>
+                    <button id="cancelEditBtn" class="neo-btn neo-btn-outline neo-btn-sm hidden" onclick="cancelEdit()">
+                        <i class="fas fa-times"></i> إلغاء التعديل
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>الشهر</label>
+                    <select id="reportMonth" class="neo-input">
+                        <option value="january">يناير</option>
+                        <option value="february">فبراير</option>
+                        <option value="march">مارس</option>
+                        <option value="april">أبريل</option>
+                        <option value="may">مايو</option>
+                        <option value="june">يونيو</option>
+                        <option value="july">يوليو</option>
+                        <option value="august">أغسطس</option>
+                        <option value="september">سبتمبر</option>
+                        <option value="october">أكتوبر</option>
+                        <option value="november">نوفمبر</option>
+                        <option value="decembre">ديسمبر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>السنة</label>
+                    <select id="reportYear" class="neo-input">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عدد العينات</label>
+                    <input type="number" id="samplesCount" class="neo-input" placeholder="0" />
+                </div>
+                <div class="form-group">
+                    <label>سعر العينة</label>
+                    <input type="number" id="samplePrice" class="neo-input" placeholder="50000" value="50000" />
+                </div>
+                <div class="form-group">
+                    <label>إجمالي الإيرادات (يحسب تلقائيا)</label>
+                    <input type="number" id="totalRevenue" class="neo-input" placeholder="0" />
+                </div>
+                <div class="form-group">
+                    <label>إجمالي المصروفات</label>
+                    <input type="number" id="totalExpenses" class="neo-input" placeholder="0" />
+                </div>
+                <div class="form-group form-full">
+                    <label>صافي الأرباح (يحسب تلقائيا)</label>
+                    <input type="number" id="netProfit" class="neo-input" placeholder="0" />
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h3>بنود المصروفات التفصيلية</h3>
+                <div id="expensesContainer">
+                    <div class="expense-row">
+                        <input type="text" class="neo-input expense-desc" placeholder="وصف البند" />
+                        <input type="number" class="neo-input expense-amount" placeholder="المبلغ" />
+                        <button class="neo-btn" style="padding:12px;" onclick="removeExpenseRow(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="neo-btn neo-btn-outline mt-12" onclick="addExpenseRow()">
+                    <i class="fas fa-plus"></i> إضافة بند
+                </button>
+            </div>
+
+            <div class="flex-row mt-16">
+                <button class="neo-btn" onclick="auditWithAI()">
+                    <i class="fas fa-robot"></i> تدقيق التقرير بواسطة AI
+                </button>
+                <button class="neo-btn" id="publishBtn" onclick="publishReport()">
+                    <i class="fas fa-cloud-upload-alt"></i> نشر التقرير
+                </button>
+                <button class="neo-btn neo-btn-outline" onclick="calculateTotals()">
+                    <i class="fas fa-calculator"></i> احسب الإجماليات
+                </button>
+            </div>
+
+            <div id="auditResult" class="result-box" style="display:none;"></div>
+            <div id="autoCalcInfo" class="result-box" style="display:none;margin-top:8px;"></div>
+            <div id="publishFcmStatus" style="margin-top:8px;font-size:11px;color:var(--gray-dark);text-align:center;"></div>
+        </div>
+    </div>
+
+    <div id="notificationsSection" style="display:none;">
+        <div class="neo-card">
+            <h2>إرسال إشعار فوري</h2>
+            <div class="form-group">
+                <label>عنوان الإشعار</label>
+                <input type="text" id="notifTitle" class="neo-input" placeholder="مثلا: تقرير شهر مايو 2026" />
+            </div>
+            <div class="form-group">
+                <label>نص الإشعار</label>
+                <textarea id="notifBody" class="neo-input" rows="3" placeholder="محتوى الإشعار"></textarea>
+            </div>
+            <div class="form-group">
+                <label>نوع الإشعار</label>
+                <select id="notifType" class="neo-input">
+                    <option value="general">نص عام</option>
+                    <option value="report">إشعار بتقرير جديد</option>
+                </select>
+            </div>
+            <div class="form-group" id="reportSelectGroup" style="display:none;">
+                <label>اختر التقرير المرفق (اختياري - إذا لم تختر، يفتح الإشعار التطبيق)</label>
+                <select id="notifReportSelect" class="neo-input"></select>
+            </div>
+            <button class="neo-btn mt-12" onclick="sendNotification()">
+                <i class="fas fa-paper-plane"></i> إرسال الإشعار
+            </button>
+            <div style="margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <button class="neo-btn neo-btn-outline neo-btn-sm" onclick="testFCM()">
+                    <i class="fas fa-vial"></i> اختبار الإشعارات
+                </button>
+                <span id="fcmStatus" style="font-size:11px;color:var(--gray-dark);">جاري فحص سيرفر الإشعارات...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="historySection" style="display:none;">
+        <div class="neo-card">
+            <h2>التقارير السابقة - اضغط على أي تقرير لتعديله</h2>
+            <div class="flex-row mb-16">
+                <button class="neo-btn neo-btn-outline neo-btn-sm" onclick="cleanupOldEntries()">
+                    <i class="fas fa-broom"></i> تنظيف القيود القديمة
+                </button>
+            </div>
+            <div id="reportsHistoryTable" class="table-scroll"></div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, set, push, get, child, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDG5KPA02WQzt3ZGV8g0U57hcRmu_kXvO8",
+        authDomain: "bida-ai-999.firebaseapp.com",
+        databaseURL: "https://bida-ai-999-default-rtdb.firebaseio.com",
+        projectId: "bida-ai-999",
+        storageBucket: "bida-ai-999.firebasestorage.app",
+        messagingSenderId: "164233189036",
+        appId: "1:164233189036:web:c9de0ae64c378e06627109",
+        measurementId: "G-9PRG89N5F2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    window.auth = auth;
+    window.db = db;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.onAuthStateChanged = onAuthStateChanged;
+    window.signOut = signOut;
+    window.ref = ref;
+    window.set = set;
+    window.push = push;
+    window.get = get;
+    window.child = child;
+    window.onValue = onValue;
+    window.remove = remove;
+
+    window._fcmResult = function(result) {
+        if (result.success) {
+            showToast('✅ تم إرسال الإشعار بنجاح', 'success');
+        } else {
+            showToast('❌ فشل: ' + result.error, 'error');
+        }
+    };
+
+    window.sendFCM = function(title, body, reportId) {
+        return new Promise((resolve, reject) => {
+            if (typeof AndroidFCM !== 'undefined') {
+                const origResolve = resolve;
+                const origReject = reject;
+                window._fcmResolve = origResolve;
+                window._fcmReject = origReject;
+                window._fcmResult = function(result) {
+                    if (result.success) {
+                        showToast('✅ تم إرسال الإشعار بنجاح', 'success');
+                        origResolve();
+                    } else {
+                        showToast('❌ فشل: ' + result.error, 'error');
+                        origReject(new Error(result.error));
+                    }
+                };
+                AndroidFCM.sendNotification(title, body);
+            } else {
+                showToast('❌ الإشعارات غير متوفرة في هذا الإصدار', 'error');
+                reject(new Error('الإشعارات غير متوفرة'));
+            }
+        });
+    };
+
+    window.testFCM = function() {
+        const body = 'إشعار تجريبي من لوحة التحكم - ' + new Date().toLocaleString('ar-IQ');
+        sendFCM('🔔 اختبار الإشعارات', body, '').then(() => {
+            document.getElementById('fcmStatus').textContent = '✅ الإشعارات شغالة';
+            document.getElementById('fcmStatus').style.color = '#008000';
+        }).catch(e => {
+            document.getElementById('fcmStatus').textContent = '❌ فشل: ' + e.message;
+            document.getElementById('fcmStatus').style.color = '#CC0000';
+        });
+    };
+
+    setTimeout(() => {
+        const statusEl = document.getElementById('fcmStatus');
+        const pubStatus = document.getElementById('publishFcmStatus');
+        if (typeof AndroidFCM !== 'undefined') {
+            statusEl.textContent = '✅ تطبيق مستقل - إشعارات جاهزة';
+            statusEl.style.color = '#008000';
+            if (pubStatus) pubStatus.textContent = '✅ الإشعارات شغالة';
+        } else {
+            statusEl.textContent = '⚠️ بيئة غير معروفة';
+            statusEl.style.color = '#CC0000';
+        }
+    }, 1000);
+
+    const monthNumbers = {
+        'january':1,'february':2,'march':3,'april':4,'may':5,'june':6,
+        'july':7,'august':8,'september':9,'october':10,'november':11,'decembre':12
+    };
+    const monthNames = {
+        'january':'يناير','february':'فبراير','march':'مارس','april':'أبريل',
+        'may':'مايو','june':'يونيو','july':'يوليو','august':'أغسطس',
+        'september':'سبتمبر','october':'أكتوبر','november':'نوفمبر','decembre':'ديسمبر'
+    };
+
+    let editingMonthKey = null;
+
+    window.login = function() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) { showToast('يرجى إدخال البريد وكلمة المرور', 'error'); return; }
+        signInWithEmailAndPassword(auth, email, password)
+            .then(() => showToast('تم تسجيل الدخول بنجاح', 'success'))
+            .catch(err => showToast('خطأ في تسجيل الدخول: ' + err.message, 'error'));
+    };
+
+    window.logout = function() {
+        signOut(auth).then(() => {
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('notificationsSection').style.display = 'none';
+            showToast('تم تسجيل الخروج', 'success');
+        });
+    };
+
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            document.getElementById('loginSection').classList.remove('active');
+            document.getElementById('dashboardSection').classList.add('active');
+            document.getElementById('currentUserDisplay').textContent = user.email;
+            resetForm();
+            loadReportsHistory();
+        } else {
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('dashboardSection').classList.remove('active');
+            signInWithEmailAndPassword(auth, 'admin@abuidris.com', 'AbuIdris2026!').catch(() => {});
+        }
+    });
+
+    document.getElementById('notifType').addEventListener('change', function() {
+        document.getElementById('reportSelectGroup').style.display = this.value === 'report' ? 'block' : 'none';
+    });
+
+    window.showSection = function(section) {
+        if (historyListenerRef) { historyListenerRef(); historyListenerRef = null; }
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('notificationsSection').style.display = 'none';
+        document.getElementById('historySection').style.display = 'none';
+        if (section === 'dashboard') {
+            if (!editingMonthKey) resetForm();
+            document.getElementById('dashboardSection').style.display = 'block';
+        }
+        if (section === 'notifications') {
+            document.getElementById('notificationsSection').style.display = 'block';
+            loadReportSelect();
+        }
+        if (section === 'history') {
+            document.getElementById('historySection').style.display = 'block';
+            loadReportsHistory();
+        }
+    };
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    window.showToast = showToast;
+
+    window.calculateTotals = function() {
+        const samples = parseInt(document.getElementById('samplesCount').value) || 0;
+        const price = parseInt(document.getElementById('samplePrice').value) || 0;
+        const revenue = samples * price;
+        const expenses = parseInt(document.getElementById('totalExpenses').value) || 0;
+        const profit = revenue - expenses;
+
+        document.getElementById('totalRevenue').value = revenue;
+        document.getElementById('netProfit').value = profit;
+
+        const info = document.getElementById('autoCalcInfo');
+        info.style.display = 'block';
+        info.innerHTML = 'تم حساب الإجماليات:\nالعينات: ' + samples.toLocaleString() + '\nسعر العينة: ' + price.toLocaleString() + '\nالإيرادات: ' + revenue.toLocaleString() + '\nالمصروفات: ' + expenses.toLocaleString() + '\nصافي الأرباح: ' + profit.toLocaleString();
+        if (profit < 0) info.style.borderColor = '#FF0000';
+        else info.style.borderColor = '#000000';
+    };
+
+    window.addExpenseRow = function(data) {
+        const container = document.getElementById('expensesContainer');
+        const row = document.createElement('div');
+        row.className = 'expense-row';
+        const descInput = document.createElement('input');
+        descInput.type = 'text';
+        descInput.className = 'neo-input expense-desc';
+        descInput.placeholder = 'وصف البند';
+        if (data && data.description) descInput.value = data.description;
+        const amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.className = 'neo-input expense-amount';
+        amountInput.placeholder = 'المبلغ';
+        if (data && data.amount) amountInput.value = data.amount;
+        amountInput.addEventListener('input', recalculateExpenses);
+        const btn = document.createElement('button');
+        btn.className = 'neo-btn';
+        btn.style.padding = '12px';
+        btn.innerHTML = '<i class="fas fa-times"></i>';
+        btn.onclick = function() { removeExpenseRow(this); };
+        row.appendChild(descInput);
+        row.appendChild(amountInput);
+        row.appendChild(btn);
+        container.appendChild(row);
+        recalculateExpenses();
+    };
+
+    window.removeExpenseRow = function(btn) {
+        const row = btn.parentElement;
+        const container = document.getElementById('expensesContainer');
+        if (container.children.length > 1) row.remove();
+        else showToast('يجب أن يبقى بند واحد على الأقل', 'error');
+        recalculateExpenses();
+    };
+
+    let _recalcTimer = null;
+    window.recalculateExpenses = function() {
+        // تأخير خفيف (debounce) لتجنب إعادة الحساب مع كل حرف عند الكتابة السريعة على لوحة مفاتيح الجوال
+        clearTimeout(_recalcTimer);
+        _recalcTimer = setTimeout(_recalculateExpensesNow, 80);
+    };
+    function _recalculateExpensesNow() {
+        const samples = parseInt(document.getElementById('samplesCount').value) || 0;
+        const price = parseInt(document.getElementById('samplePrice').value) || 0;
+        const revenue = samples * price;
+        const rows = document.querySelectorAll('.expense-row');
+        let totalExpenses = 0;
+        rows.forEach(row => {
+            const amount = parseInt(row.querySelector('.expense-amount').value) || 0;
+            totalExpenses += amount;
+        });
+        const profit = revenue - totalExpenses;
+        document.getElementById('totalExpenses').value = totalExpenses;
+        document.getElementById('totalRevenue').value = revenue;
+        document.getElementById('netProfit').value = profit;
+    };
+
+    function resetForm() {
+        document.getElementById('reportMonth').value = 'january';
+        document.getElementById('reportYear').value = '2026';
+        document.getElementById('samplesCount').value = '';
+        document.getElementById('samplePrice').value = '50000';
+        document.getElementById('totalRevenue').value = '';
+        document.getElementById('totalExpenses').value = '';
+        document.getElementById('netProfit').value = '';
+        document.getElementById('autoCalcInfo').style.display = 'none';
+        document.getElementById('auditResult').style.display = 'none';
+        const container = document.getElementById('expensesContainer');
+        container.innerHTML = '';
+        addExpenseRow();
+        editingMonthKey = null;
+        document.getElementById('formModeBadge').textContent = 'تقرير جديد';
+        document.getElementById('formTitle').textContent = 'إدخال بيانات التقرير الشهري';
+        document.getElementById('publishBtn').innerHTML = '<i class="fas fa-cloud-upload-alt"></i> نشر التقرير';
+        document.getElementById('cancelEditBtn').classList.add('hidden');
+    }
+
+    window.cancelEdit = function() {
+        resetForm();
+        showToast('تم إلغاء التعديل', 'success');
+    };
+
+    window.editReport = function(monthKey) {
+        const reportsRef = ref(db, 'reports/' + monthKey);
+        get(reportsRef).then(snapshot => {
+            const d = snapshot.val();
+            if (!d) { showToast('لم يتم العثور على التقرير', 'error'); return; }
+
+            editingMonthKey = monthKey;
+
+            const monthKeyParts = monthKey.split('-');
+            const year = monthKeyParts[0];
+            const monthNum = parseInt(monthKeyParts[1]);
+            const monthStr = Object.keys(monthNumbers).find(k => monthNumbers[k] === monthNum) || 'january';
+
+            document.getElementById('reportMonth').value = monthStr;
+            document.getElementById('reportYear').value = year;
+            document.getElementById('samplesCount').value = d.samplesCount || 0;
+            document.getElementById('samplePrice').value = d.samplesCount > 0 && d.totalRevenue > 0 ? Math.round(d.totalRevenue / d.samplesCount) : 50000;
+            document.getElementById('totalRevenue').value = d.totalRevenue || 0;
+            document.getElementById('totalExpenses').value = d.totalExpenses || 0;
+            document.getElementById('netProfit').value = d.netProfit || 0;
+
+            const container = document.getElementById('expensesContainer');
+            container.innerHTML = '';
+            if (d.expenseItems && d.expenseItems.length > 0) {
+                d.expenseItems.forEach(item => addExpenseRow(item));
+            } else {
+                addExpenseRow();
+            }
+
+            document.getElementById('formModeBadge').textContent = 'تعديل تقرير';
+            document.getElementById('formTitle').textContent = 'تعديل التقرير - ' + (d.monthName || monthStr) + ' ' + year;
+            document.getElementById('publishBtn').innerHTML = '<i class="fas fa-save"></i> حفظ التعديلات';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            document.getElementById('autoCalcInfo').style.display = 'none';
+            document.getElementById('auditResult').style.display = 'none';
+
+            showSection('dashboard');
+        }).catch(err => showToast('خطأ في تحميل التقرير: ' + err.message, 'error'));
+    };
+
+    window.auditWithAI = function() {
+        const resultBox = document.getElementById('auditResult');
+        resultBox.style.display = 'block';
+        resultBox.className = 'result-box';
+        resultBox.textContent = 'جاري تدقيق التقرير بواسطة الذكاء الاصطناعي...';
+
+        const month = document.getElementById('reportMonth').value;
+        const year = document.getElementById('reportYear').value;
+        const samples = parseInt(document.getElementById('samplesCount').value) || 0;
+        const price = parseInt(document.getElementById('samplePrice').value) || 0;
+        const revenue = parseInt(document.getElementById('totalRevenue').value) || 0;
+        const expenses = parseInt(document.getElementById('totalExpenses').value) || 0;
+        const profit = parseInt(document.getElementById('netProfit').value) || 0;
+
+        const expenseRows = document.querySelectorAll('.expense-row');
+        let expenseDetails = [];
+        let sumExpenses = 0;
+        expenseRows.forEach(row => {
+            const desc = row.querySelector('.expense-desc').value;
+            const amount = parseInt(row.querySelector('.expense-amount').value) || 0;
+            if (desc) {
+                expenseDetails.push(desc + ': ' + amount.toLocaleString());
+                sumExpenses += amount;
+            }
+        });
+
+        const prompt = 'أنت مدقق مالي خبير. قم بتدقيق بيانات التقرير التالي لمعمل تحليل ومعايرة الذهب:\n\n' +
+            'الشهر: ' + month + ' ' + year + '\n' +
+            'عدد العينات المدخل: ' + samples + '\n' +
+            'سعر العينة: ' + price + '\n' +
+            'الإيرادات المحسوبة (عدد العينات x سعر العينة): ' + (samples * price).toLocaleString() + '\n' +
+            'الإيرادات المدخلة في الحقل: ' + revenue.toLocaleString() + '\n' +
+            'إجمالي المصروفات المدخل: ' + expenses.toLocaleString() + '\n' +
+            'مجموع بنود المصروفات التفصيلية: ' + sumExpenses.toLocaleString() + '\n' +
+            'صافي الأرباح المدخل: ' + profit.toLocaleString() + '\n' +
+            'صافي الأرباح المتوقع (إيرادات - مصروفات): ' + (revenue - expenses).toLocaleString() + '\n\n' +
+            'بنود المصروفات:\n' + expenseDetails.join('\n') + '\n\n' +
+            'قم بالتحقق من:\n' +
+            '1. هل الإيرادات المدخلة = عدد العينات × سعر العينة؟\n' +
+            '2. هل مجموع بنود المصروفات التفصيلية = إجمالي المصروفات المدخل؟\n' +
+            '3. هل صافي الأرباح = الإيرادات - المصروفات؟\n' +
+            '4. هل هناك قفزات غير منطقية في الأرقام مقارنة بالشهر السابق؟\n\n' +
+            'إذا كانت جميع الحسابات صحيحة ومنطقية، اكتب "التقرير سليم" مع ملخص سريع.\n' +
+            'إذا كان هناك خطأ، اكتب "يوجد خطأ" مع شرح المشكلة بالتفصيل.';
+
+        const GEMINI_API_KEY = 'AIzaSyDG5KPA02WQzt3ZGV8g0U57hcRmu_kXvO8';
+        // ملاحظة: تم استخدام موديل gemini-2.0-flash لأن gemini-pro القديم أصبح متوقفًا (deprecated).
+        // إذا ظهر خطأ 404 لاحقًا بسبب تغييرات جوجل على أسماء الموديلات، حدّث اسم الموديل في هذا السطر.
+        const GEMINI_MODEL = 'gemini-2.0-flash';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // مهلة 20 ثانية لتجنب تعليق الواجهة داخل WebView عند ضعف الشبكة
+
+        fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_API_KEY, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.2, maxOutputTokens: 1024 }
+            })
+        })
+        .then(res => {
+            clearTimeout(timeoutId);
+            if (!res.ok) throw new Error('استجابة الخادم غير صحيحة (' + res.status + ')');
+            return res.json();
+        })
+        .then(data => {
+            const text = (data.candidates && data.candidates[0] && data.candidates[0].content &&
+                data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+                data.candidates[0].content.parts[0].text) || 'تعذر الحصول على نتيجة';
+            const isPass = text.includes('سليم') && !text.includes('خطأ');
+            resultBox.className = 'result-box ' + (isPass ? 'pass' : 'fail');
+            resultBox.textContent = 'نتيجة التدقيق:\n\n' + text;
+        })
+        .catch(err => {
+            clearTimeout(timeoutId);
+            resultBox.className = 'result-box fail';
+            const msg = err.name === 'AbortError' ? 'انتهت مهلة الاتصال، تحقق من الشبكة وحاول مجددًا' : err.message;
+            resultBox.textContent = 'خطأ في الاتصال بالذكاء الاصطناعي: ' + msg;
+        });
+    };
+
+    window.publishReport = function() {
+        const month = document.getElementById('reportMonth').value;
+        const year = document.getElementById('reportYear').value;
+        const samples = parseInt(document.getElementById('samplesCount').value) || 0;
+        const price = parseInt(document.getElementById('samplePrice').value) || 0;
+        const revenue = parseInt(document.getElementById('totalRevenue').value) || 0;
+        const expenses = parseInt(document.getElementById('totalExpenses').value) || 0;
+        const profit = parseInt(document.getElementById('netProfit').value) || 0;
+
+        if (!samples || !revenue) {
+            showToast('يرجى إدخال البيانات كاملة قبل النشر', 'error');
+            return;
+        }
+
+        const monthKey = year + '-' + String(monthNumbers[month] || 1).padStart(2, '0');
+        const monthName = monthNames[month] || month;
+        const expenseRows = document.querySelectorAll('.expense-row');
+        let expenseItems = [];
+        expenseRows.forEach(row => {
+            const desc = row.querySelector('.expense-desc').value;
+            const amount = parseInt(row.querySelector('.expense-amount').value) || 0;
+            if (desc && amount > 0) {
+                expenseItems.push({ description: desc, amount: amount });
+            }
+        });
+
+        const reportData = {
+            monthKey: monthKey,
+            monthName: monthName,
+            year: parseInt(year),
+            samplesCount: samples,
+            totalRevenue: revenue,
+            totalExpenses: expenses,
+            netProfit: profit,
+            createdAt: editingMonthKey ? Date.now() : Date.now(),
+            expenseItems: expenseItems
+        };
+
+        const checkRef = ref(db, 'reports/' + monthKey);
+        get(checkRef).then(snapshot => {
+            if (snapshot.exists() && !editingMonthKey) {
+                showToast('❌ هذا الشهر موجود مسبقاً! عدّل التقرير الموجود بدل إنشاء جديد.', 'error');
+                return;
+            }
+            const reportsRef = ref(db, 'reports/' + monthKey);
+            set(reportsRef, reportData)
+                .then(() => {
+                    if (editingMonthKey) {
+                        showToast('تم تحديث التقرير بنجاح', 'success');
+                    } else {
+                        showToast('تم نشر التقرير بنجاح', 'success');
+                        sendReportNotification(monthKey, monthName, year);
+                    }
+                    resetForm();
+                    loadReportsHistory();
+                })
+                .catch(err => showToast('خطأ في الحفظ: ' + err.message, 'error'));
+        }).catch(() => {
+            const reportsRef = ref(db, 'reports/' + monthKey);
+            set(reportsRef, reportData)
+                .then(() => {
+                    if (editingMonthKey) {
+                        showToast('تم تحديث التقرير بنجاح', 'success');
+                    } else {
+                        showToast('تم نشر التقرير بنجاح', 'success');
+                        sendReportNotification(monthKey, monthName, year);
+                    }
+                    resetForm();
+                    loadReportsHistory();
+                })
+                .catch(err => showToast('خطأ في الحفظ: ' + err.message, 'error'));
+        });
+    };
+
+    function sendReportNotification(monthKey, monthName, year) {
+        const title = 'تقرير جديد: ' + monthName + ' ' + year;
+        const body = 'تم نشر تقرير شهر ' + monthName + ' ' + year + '. يمكنك عرض التفاصيل الآن.';
+        push(ref(db, 'notifications'), { type: 'report', title: title, body: body, report_id: monthKey, timestamp: Date.now(), sent: false }).catch(() => {});
+        sendFCM(title, body, monthKey).catch(e => showToast('❌ ' + e.message, 'error'));
+    }
+
+    window.sendNotification = function() {
+        const title = document.getElementById('notifTitle').value;
+        const body = document.getElementById('notifBody').value;
+        const type = document.getElementById('notifType').value;
+
+        if (!title || !body) { showToast('يرجى إدخال عنوان ونص الإشعار', 'error'); return; }
+
+        const notifData = {
+            type: type,
+            title: title,
+            body: body,
+            timestamp: Date.now(),
+            sent: false
+        };
+
+        let reportId = null;
+        if (type === 'report') {
+            reportId = document.getElementById('notifReportSelect').value;
+            if (reportId) notifData.report_id = reportId;
+        }
+
+        const btn = document.querySelector('#notificationsSection .neo-btn:not(.neo-btn-sm)');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; }
+
+        push(ref(db, 'notifications'), notifData).catch(() => {});
+
+        sendFCM(title, body, reportId).then(() => {
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifBody').value = '';
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الإشعار'; }
+        }).catch(() => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الإشعار'; }
+        });
+    };
+
+    function loadReportSelect() {
+        const select = document.getElementById('notifReportSelect');
+        const reportsRef = ref(db, 'reports');
+        onValue(reportsRef, snapshot => {
+            select.innerHTML = '<option value="">-- بدون تقرير (يفتح التطبيق) --</option>';
+            const options = [];
+            snapshot.forEach(child => {
+                const data = child.val();
+                const mk = data.monthKey || child.key;
+                if (data && /^\d{4}-\d{2}$/.test(mk)) {
+                    options.push({ key: mk, name: data.monthName + ' ' + data.year, sortKey: mk });
+                }
+            });
+            options.sort((a, b) => a.sortKey < b.sortKey ? 1 : -1);
+            options.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt.key;
+                el.textContent = opt.name;
+                select.appendChild(el);
+            });
+        }, { onlyOnce: true });
+    }
+
+    // ترتيب الشهر يُحسب رياضيًا (سنة × 12 + رقم الشهر) بدل جدول ثابت
+    // هذا حل جذري: لا حاجة لتحديث أي جدول يدويًا كل سنة، ويعمل مع أي تاريخ ماضي أو مستقبلي بلا حدود
+    function monthKeySortValue(monthKey) {
+        const parts = (monthKey || '').split('-');
+        const y = parseInt(parts[0], 10) || 0;
+        const m = parseInt(parts[1], 10) || 0;
+        return y * 12 + m;
+    }
+
+    let historyListenerRef = null;
+
+    function loadReportsHistory() {
+        if (historyListenerRef) { historyListenerRef(); historyListenerRef = null; }
+        const tableDiv = document.getElementById('reportsHistoryTable');
+        tableDiv.innerHTML = '<p style="padding:12px;color:var(--gray-dark);">جاري التحميل...</p>';
+        const reportsRef = ref(db, 'reports');
+        historyListenerRef = onValue(reportsRef, snapshot => {
+            let html = '<table><thead><tr><th>الشهر</th><th>العينات</th><th>الإيرادات</th><th>المصروفات</th><th>صافي الربح</th><th>تعديل</th><th>حذف</th></tr></thead><tbody>';
+
+            // حل جذري لمشكلة القيود القديمة: نجمع كل الإدخالات بحسب monthKey،
+            // وإذا وُجد أكثر من إدخال لنفس الشهر (بسبب مفاتيح push() قديمة عشوائية)
+            // نفضّل: 1) الإدخال المخزن تحت مفتاح مطابق لـ monthKey نفسه (الصيغة الصحيحة الحالية)
+            //        2) وإن لم يوجد، نفضّل الأحدث بحسب createdAt
+            // بهذا تختفي التكرارات تلقائيًا بدون أي تدخل يدوي.
+            const byMonth = new Map();
+            snapshot.forEach(child => {
+                const d = child.val();
+                if (!d || !d.monthKey || !/^\d{4}-\d{2}$/.test(d.monthKey)) return;
+                const candidate = { key: child.key, data: d };
+                const existing = byMonth.get(d.monthKey);
+                if (!existing) {
+                    byMonth.set(d.monthKey, candidate);
+                    return;
+                }
+                const candidateIsCanonical = candidate.key === d.monthKey;
+                const existingIsCanonical = existing.key === existing.data.monthKey;
+                if (candidateIsCanonical && !existingIsCanonical) {
+                    byMonth.set(d.monthKey, candidate);
+                } else if (candidateIsCanonical === existingIsCanonical) {
+                    const candidateTime = candidate.data.createdAt || 0;
+                    const existingTime = existing.data.createdAt || 0;
+                    if (candidateTime > existingTime) byMonth.set(d.monthKey, candidate);
+                }
+            });
+
+            const rows = Array.from(byMonth.values());
+            rows.sort((a, b) => monthKeySortValue(b.data.monthKey) - monthKeySortValue(a.data.monthKey));
+
+            if (rows.length === 0) {
+                tableDiv.innerHTML = '<p style="padding:12px;color:var(--gray-dark);">لا توجد تقارير بعد.</p>';
+                return;
+            }
+
+            rows.forEach(r => {
+                const d = r.data;
+                const expenseDetails = (d.expenseItems || []).map(e => e.description + ': ' + (e.amount || 0).toLocaleString()).join(' | ');
+                html += '<tr>' +
+                    '<td><strong>' + d.monthName + ' ' + d.year + '</strong></td>' +
+                    '<td class="text-amount">' + (d.samplesCount || 0).toLocaleString() + '</td>' +
+                    '<td class="text-amount">' + (d.totalRevenue || 0).toLocaleString() + '</td>' +
+                    '<td class="text-amount">' + (d.totalExpenses || 0).toLocaleString() + '</td>' +
+                    '<td class="text-amount">' + (d.netProfit || 0).toLocaleString() + '</td>' +
+                    '<td><button class="neo-btn neo-btn-sm" onclick="event.stopPropagation(); window.editReport(\'' + r.key + '\')"><i class="fas fa-edit"></i></button></td>' +
+                    '<td><button class="neo-btn neo-btn-sm" style="background:#CC0000;border-color:#CC0000;" onclick="event.stopPropagation(); window.deleteReport(\'' + r.key + '\', \'' + d.monthName + ' ' + d.year + '\')"><i class="fas fa-trash"></i></button></td>' +
+                    '</tr>';
+                if (expenseDetails) {
+                    html += '<tr style="background:#F9F9F9;"><td colspan="7" style="font-size:12px;color:#666;padding:4px 12px;">' + expenseDetails + '</td></tr>';
+                }
+            });
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        });
+    }
+
+    window.deleteReport = function(key, label) {
+        if (!confirm('هل أنت متأكد من حذف تقرير "' + label + '"؟\n\nهذا الإجراء لا يمكن التراجع عنه.')) return;
+        remove(ref(db, 'reports/' + key))
+            .then(() => {
+                showToast('تم حذف التقرير بنجاح', 'success');
+                loadReportsHistory();
+            })
+            .catch(err => showToast('خطأ في الحذف: ' + err.message, 'error'));
+    };
+
+    window.cleanupOldEntries = function() {
+        if (!confirm('سيتم حذف جميع القيود القديمة/المكررة (المفاتيح غير المطابقة لصيغة YYYY-MM، وأي نسخ مكررة قديمة لنفس الشهر). هل أنت متأكد؟')) return;
+        const reportsRef = ref(db, 'reports');
+        get(reportsRef).then(snapshot => {
+            const toDelete = [];
+            // المرحلة 1: مفاتيح لا تطابق صيغة YYYY-MM إطلاقًا (بيانات تالفة/تجريبية قديمة)
+            const byMonth = new Map();
+            snapshot.forEach(child => {
+                const key = child.key || '';
+                const d = child.val();
+                const mk = d && d.monthKey;
+                if (!/^\d{4}-\d{2}$/.test(key) && (!mk || !/^\d{4}-\d{2}$/.test(mk))) {
+                    toDelete.push(key);
+                    return;
+                }
+                const effectiveMonthKey = /^\d{4}-\d{2}$/.test(key) ? key : mk;
+                if (!byMonth.has(effectiveMonthKey)) byMonth.set(effectiveMonthKey, []);
+                byMonth.get(effectiveMonthKey).push({ key, data: d, createdAt: (d && d.createdAt) || 0 });
+            });
+            // المرحلة 2: لكل شهر فيه أكثر من نسخة، احتفظ بالأفضل (مفتاح مطابق أو الأحدث) واحذف الباقي
+            byMonth.forEach((entries, mk) => {
+                if (entries.length <= 1) return;
+                entries.sort((a, b) => {
+                    const aCanonical = a.key === mk ? 1 : 0;
+                    const bCanonical = b.key === mk ? 1 : 0;
+                    if (aCanonical !== bCanonical) return bCanonical - aCanonical;
+                    return b.createdAt - a.createdAt;
+                });
+                entries.slice(1).forEach(e => toDelete.push(e.key));
+            });
+
+            if (toDelete.length === 0) { showToast('لا توجد قيود قديمة أو مكررة للحذف', 'success'); return; }
+            Promise.all(toDelete.map(k => remove(ref(db, 'reports/' + k))))
+                .then(() => {
+                    showToast('تم حذف ' + toDelete.length + ' قيد قديم/مكرر بنجاح', 'success');
+                    loadReportsHistory();
+                }).catch(err => showToast('خطأ في الحذف: ' + err.message, 'error'));
+        }).catch(err => showToast('خطأ في القراءة: ' + err.message, 'error'));
+    };
+
+    document.getElementById('samplesCount').addEventListener('input', calculateTotals);
+    document.getElementById('samplePrice').addEventListener('input', calculateTotals);
+    document.getElementById('totalExpenses').addEventListener('input', calculateTotals);
+</script>
+
+</body>
+</html>

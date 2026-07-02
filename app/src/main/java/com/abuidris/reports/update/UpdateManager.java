@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
@@ -19,6 +18,9 @@ public class UpdateManager {
     private static final String PREFS_NAME = "update_prefs";
     private static final String KEY_PENDING_VERSION = "pending_version_code";
     private static final String KEY_APK_PATH = "pending_apk_path";
+    private static final String KEY_AVAILABLE_VERSION = "available_version_code";
+    private static final String KEY_AVAILABLE_URL = "available_apk_url";
+    private static final String KEY_AVAILABLE_NAME = "available_version_name";
 
     private final Context context;
     private final Handler mainHandler;
@@ -28,11 +30,17 @@ public class UpdateManager {
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
 
+    // called from Application.onCreate - just checks and saves availability
     public void checkAndDownload() {
         VersionChecker.check(context, new VersionChecker.Callback() {
             @Override
             public void onResult(int remoteVersionCode, String apkUrl, String versionName) {
-                mainHandler.post(() -> showProgressAndDownload(remoteVersionCode, apkUrl, versionName));
+                SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                prefs.edit()
+                    .putInt(KEY_AVAILABLE_VERSION, remoteVersionCode)
+                    .putString(KEY_AVAILABLE_URL, apkUrl)
+                    .putString(KEY_AVAILABLE_NAME, versionName)
+                    .apply();
             }
 
             @Override
@@ -44,6 +52,25 @@ public class UpdateManager {
             public void onUpToDate() {
             }
         });
+    }
+
+    // called from MainActivity.onResume - processes pending install or shows update dialog
+    public void processUpdate(Activity activity) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int availableVersion = prefs.getInt(KEY_AVAILABLE_VERSION, -1);
+        if (availableVersion > getLocalVersionCode()) {
+            String apkUrl = prefs.getString(KEY_AVAILABLE_URL, null);
+            String versionName = prefs.getString(KEY_AVAILABLE_NAME, null);
+            if (apkUrl != null && versionName != null) {
+                prefs.edit()
+                    .remove(KEY_AVAILABLE_VERSION)
+                    .remove(KEY_AVAILABLE_URL)
+                    .remove(KEY_AVAILABLE_NAME)
+                    .apply();
+                showProgressAndDownload(activity, availableVersion, apkUrl, versionName);
+            }
+        }
     }
 
     public void checkPendingInstall() {
@@ -68,7 +95,7 @@ public class UpdateManager {
 
         File apkFile = new File(apkPath);
         if (apkFile.exists()) {
-            promptInstall(apkFile);
+            promptInstall();
         } else {
             prefs.edit().clear().apply();
         }
@@ -82,8 +109,8 @@ public class UpdateManager {
         }
     }
 
-    private void showProgressAndDownload(int versionCode, String apkUrl, String versionName) {
-        UpdateDialog dialog = UpdateDialog.show(context, versionName);
+    private void showProgressAndDownload(Activity activity, int versionCode, String apkUrl, String versionName) {
+        UpdateDialog dialog = UpdateDialog.show(activity, versionName);
         dialog.setCancelable(false);
 
         ApkDownloader.download(context, apkUrl, new ApkDownloader.Callback() {
@@ -100,7 +127,7 @@ public class UpdateManager {
                     .putInt(KEY_PENDING_VERSION, versionCode)
                     .putString(KEY_APK_PATH, apkFile.getAbsolutePath())
                     .apply();
-                promptInstall(apkFile);
+                promptInstall();
             }
 
             @Override
@@ -110,7 +137,15 @@ public class UpdateManager {
         });
     }
 
-    private void promptInstall(File apkFile) {
+    private void promptInstall() {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int pendingVersion = prefs.getInt(KEY_PENDING_VERSION, -1);
+        String apkPath = prefs.getString(KEY_APK_PATH, null);
+        if (apkPath == null) return;
+
+        File apkFile = new File(apkPath);
+        if (!apkFile.exists()) return;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!context.getPackageManager().canRequestPackageInstalls()) {
                 Intent settingsIntent = new Intent(

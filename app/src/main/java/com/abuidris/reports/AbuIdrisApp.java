@@ -31,6 +31,11 @@ public class AbuIdrisApp extends Application {
     private static final String PREFS_NAME = "notification_prefs";
     private static final String SHOWN_NOTIFS_KEY = "shown_notifications";
     private ReportsSyncHelper syncHelper;
+    private static UpdateManager updateManager;
+
+    public static UpdateManager getUpdateManager() {
+        return updateManager;
+    }
 
     @Override
     public void onCreate() {
@@ -45,7 +50,7 @@ public class AbuIdrisApp extends Application {
 
         FirebaseMessaging.getInstance().subscribeToTopic("all");
 
-        UpdateManager updateManager = new UpdateManager(this);
+        updateManager = new UpdateManager(this);
         updateManager.checkPendingInstall();
         updateManager.checkAndDownload();
     }

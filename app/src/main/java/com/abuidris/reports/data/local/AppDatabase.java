@@ -25,6 +25,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             "abuidris_reports.db"
                     )
                     .fallbackToDestructiveMigration()
+                    .allowMainThreadQueries()
                     .build();
                 }
             }

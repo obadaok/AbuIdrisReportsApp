@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#FFD4AF37</color>
+    <color name="black">#FF1A1A2E</color>
+    <color name="primary">#FF1A1A2E</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">تقارير</string>
+    <style name="Theme.AdminApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#FF1A1A2E</item>
+        <item name="colorOnPrimary">#FFFFFFFF</item>
+        <item name="colorPrimaryVariant">#FF1A1A2E</item>
+        <item name="colorSecondary">#FFD4AF37</item>
+        <item name="colorOnSecondary">#FF1A1A2E</item>
+        <item name="android:statusBarColor">#FF1A1A2E</item>
+        <item name="android:navigationBarColor">#FF1A1A2E</item>
+        <item name="android:windowBackground">#FFF5F5FA</item>
+    </style>
+</resources>
